@@ -10,6 +10,8 @@ hand_rect_two_y = None
 
 
 def draw_rect(frame):
+    # Zeichnen der Rechtecke
+
     rows, cols, _ = frame.shape  # .shape gibt ein Tupel aus Zeilen Spalten und Farbkomponenten zurück
     print("rows: ", rows)
     print("columns: ", cols)
@@ -32,6 +34,8 @@ def draw_rect(frame):
 
 
 def hand_histogram(frame):
+    # Erstellen des Histograms
+
     global hand_rect_one_x, hand_rect_one_y, total_rectangle
 
     hsv_frame = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
@@ -45,6 +49,8 @@ def hand_histogram(frame):
 
 
 def masking(frame_face, hist):
+    # Erstellen der Maske für Konturenerkennung
+
     hsv = cv.cvtColor(frame_face, cv.COLOR_BGR2HSV)
     mask = cv.calcBackProject([hsv], [0, 1], hist, [0, 180, 0, 256], 1)  # noch sehr verrauscht
 
@@ -59,6 +65,59 @@ def masking(frame_face, hist):
     _, mask = cv.threshold(mask, 50, 255, cv.THRESH_BINARY)  # Werte der Maske werden entweder 0 oder 255 -> treshold: Entscheidungsschwelle bis zu welchem Wert werden Values 0 gesetzt
 
     return mask
+
+
+def contours(hist_mask_image):
+    gray_hist_mask_image = cv.cvtColor(hist_mask_image, cv.COLOR_BGR2GRAY)
+    _, thresh = cv.threshold(gray_hist_mask_image, 0, 255, 0)
+    cont, _ = cv.findContours(thresh, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
+    return cont
+
+
+def centroid(max_contour):
+    moment = cv.moments(max_contour)
+
+    # Berechnung geometrischer Schwerpunkt über Moment
+    if moment['m00'] != 0:
+        x = int(moment['m10'] / moment['m00'])
+        y = int(moment['m01'] / moment['m00'])
+        return x, y
+    else:
+        return None
+
+
+def face_detection(frame):
+    # Gesichtserkennung mit Hilfe eines bereits gelernten ML Algorithmus von opencv
+
+    # einlesen der Datei
+    face_cascade = cv.CascadeClassifier('haarcascade_frontalface_default.xml')
+    frame_gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
+
+    # Anwendung des Algorithmus
+    faces = face_cascade.detectMultiScale(frame_gray)
+    for x, y, w, h in faces:
+        # Gesichter schwärzen
+        cv.ellipse(frame, (int(x+0.5*w), int(y+0.5*h)), (int(w*0.75), h), 0, 0, 360, 0, -1)
+    return frame
+
+
+def remove_background(frame, bg):
+    # Ansatz zum Entfernen des Hintergrunds
+    # Angefertigter Screenshot am Anfang wird mit aktuellem Frame verglichen. Nur veränderte Pixel werden angezeigt.
+
+    threshold = 10
+    frame_gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
+    bg = cv.cvtColor(bg, cv.COLOR_BGR2GRAY)
+    rows, cols = frame_gray.shape
+    for i in range(rows):
+        for j in range(cols):
+            if frame_gray[i, j] >= bg[i, j] - threshold and frame_gray[i, j] <= bg[i, j] + threshold:
+                frame_gray[i, j] = 0
+            else:
+                frame_gray[i, j] = 255
+    mask = cv.merge((frame_gray, frame_gray, frame_gray))
+    frame = cv.bitwise_and(frame, mask)
+    return frame
 
 
 def finger_detection(frame_bg, frame, hand_hist):
@@ -106,50 +165,6 @@ def finger_detection(frame_bg, frame, hand_hist):
             cv.circle(frame_bg, finger, 5, [0, 0, 255], -1)
 
         cv.putText(frame, str(len(finger_tips)), cont_centroid, cv.FONT_HERSHEY_PLAIN, 10, [255, 0, 0], 2)
-
-
-def contours(hist_mask_image):
-    gray_hist_mask_image = cv.cvtColor(hist_mask_image, cv.COLOR_BGR2GRAY)
-    _, thresh = cv.threshold(gray_hist_mask_image, 0, 255, 0)
-    cont, _ = cv.findContours(thresh, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
-    return cont
-
-
-def centroid(max_contour):
-    moment = cv.moments(max_contour)
-
-    # Berechnung geometrischer Schwerpunkt über Moment
-    if moment['m00'] != 0:
-        x = int(moment['m10'] / moment['m00'])
-        y = int(moment['m01'] / moment['m00'])
-        return x, y
-    else:
-        return None
-
-
-def face_detection(frame):
-    face_cascade = cv.CascadeClassifier('haarcascade_frontalface_default.xml')
-    frame_gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
-    faces = face_cascade.detectMultiScale(frame_gray)
-    for x, y, w, h in faces:
-        cv.ellipse(frame, (int(x+0.5*w), int(y+0.5*h)), (int(w*0.75), h), 0, 0, 360, 0, -1)
-    return frame
-
-
-def remove_background(frame, bg):
-    threshold = 10
-    frame_gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
-    bg = cv.cvtColor(bg, cv.COLOR_BGR2GRAY)
-    rows, cols = frame_gray.shape
-    for i in range(rows):
-        for j in range(cols):
-            if frame_gray[i, j] >= bg[i, j] - threshold and frame_gray[i, j] <= bg[i, j] + threshold:
-                frame_gray[i, j] = 0
-            else:
-                frame_gray[i, j] = 255
-    mask = cv.merge((frame_gray, frame_gray, frame_gray))
-    frame = cv.bitwise_and(frame, mask)
-    return frame
 
 
 def main():
