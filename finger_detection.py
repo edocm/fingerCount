@@ -154,11 +154,11 @@ def finger_detection(frame_bg, frame, hand_hist):
         finger_tips = []
         _, y_rect, b_rect , h_rect = cv.boundingRect(max_cont)
         for i in range(len(points)-1):  # durch alle Punkte iterieren
-            if dist(points[i], points[i+1]) > 45:  # distanz zwischen zwei Punkten muss über 45 sein
-                if dist(points[i], cont_centroid) > 0.40*((h_rect+b_rect)/2):  # distanz zwischen Punkt und Handmitte muss über 40% der Größe der Bounding Box entsprechen
-                    if points[i][1] < y_rect+0.8*h_rect:  # Punkte die an der Unterseite der Handliegen werden nicht eingeblendet
-                        if len(finger_tips) < 5:  # maximal 5 finger
-                            finger_tips.append(points[i])
+            #if dist(points[i], points[i+1]) > 45:  # distanz zwischen zwei Punkten muss über 45 sein
+            if dist(points[i], cont_centroid) > 0.40*((h_rect+b_rect)/2):  # distanz zwischen Punkt und Handmitte muss über 40% der Größe der Bounding Box entsprechen
+                if points[i][1] < y_rect+0.8*h_rect:  # Punkte die an der Unterseite der Handliegen werden nicht eingeblendet
+                    if len(finger_tips) < 5:  # maximal 5 finger
+                        finger_tips.append(points[i])
 
         for finger in finger_tips:
             cv.circle(frame, finger, 5, [0, 0, 255], -1)
