@@ -11,14 +11,14 @@ This project was build during the course image processing of my studies.
 - [OpenCV](https://opencv.org/)
 
 ## Features
-- face detection
-- fingertip detection
-- print finger count
+- Face detection
+- Fingertip detection
+- Print finger count
 
 ## How to use?
-1. Clone the repository.
+1. Clone the repository
 2. Run `python3 finger_detection.py`
-3. Place your hand over the rectangles.
-4. Press 'c' on your keyboard.
-5. Your Fingers should get detected.
-6. Press 'd' on your keyboard to close the programm.
+3. Place your hand over the rectangles
+4. Press 'c' on your keyboard
+5. Your Fingers should get detected
+6. Press 'd' on your keyboard to close the programm
