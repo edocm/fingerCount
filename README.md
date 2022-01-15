@@ -13,3 +13,4 @@ This project was build during the course image processing of my studies.
 ## Features
 - face detection
 - fingertip detection
+- print finger count
