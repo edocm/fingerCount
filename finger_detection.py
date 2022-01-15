@@ -13,8 +13,6 @@ def draw_rect(frame):
     # Zeichnen der Rechtecke
 
     rows, cols, _ = frame.shape  # .shape gibt ein Tupel aus Zeilen Spalten und Farbkomponenten zurück
-    print("rows: ", rows)
-    print("columns: ", cols)
 
     global total_rectangle, hand_rect_one_x, hand_rect_one_y, hand_rect_two_x, hand_rect_two_y
 
@@ -176,9 +174,6 @@ def main():
         _, frame = capture.read() # frame
         pressed_key = cv.waitKey(5)
 
-        if pressed_key & 0xFF == ord('b'):
-            _, bg = capture.read()
-
         if pressed_key & 0xFF == ord('c'):
             hand_hist = hand_histogram(frame)
             is_hand_hist_created = True
@@ -191,7 +186,6 @@ def main():
             draw_rect(frame)
 
         cv.imshow('webcam', frame)
-        cv.imshow('background', frame_bg)
 
         if pressed_key & 0xFF == ord('d'):
             break
