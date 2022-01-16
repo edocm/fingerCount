@@ -7,7 +7,7 @@ This project was build during the course image processing of my studies.
 ## Screenshots
 ![Example](example_result.png)
 
-## Tech/framework used
+## Framework used
 - [OpenCV](https://opencv.org/)
 
 ## Features
