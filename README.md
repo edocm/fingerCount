@@ -1,4 +1,4 @@
-# finger_detection
+# fingerCount
 This programm can count the fingers you are holding in your webcam.
 
 ## Motivation
